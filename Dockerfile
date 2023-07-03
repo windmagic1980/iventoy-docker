@@ -1,12 +1,23 @@
 ARG UBUNTU_VERSION="jammy"
 
-FROM ubuntu:${UBUNTU_VERSION}
+# Use build stage to reduce final image
+FROM ubuntu:${UBUNTU_VERSION} as build
+ARG IVENTOY_VERSION="1.0.07"
+ARG IVENTOY_DIR="/opt/iventoy"
 
-ENV IVENTOY_VERSION="1.0.03"
+ADD iventoy/iventoy-${IVENTOY_VERSION}-linux.tar.gz /
+RUN mv /iventoy-${IVENTOY_VERSION} ${IVENTOY_DIR}
+
+# Build final image
+FROM ubuntu:${UBUNTU_VERSION}
+ARG BUILD_VERSION="1"
+ARG IVENTOY_VERSION="1.0.07"
+ARG IVENTOY_DIR="/opt/iventoy"
+ENV IVENTOY_DIR_ENV=${IVENTOY_DIR}
 
 LABEL maintainer="joeclifford - git@cliffsy.co.uk"
 LABEL Name=iventoy
-LABEL Version=$IVENTOY_VERSION
+LABEL Version=${IVENTOY_VERSION}_${BUILD_VERSION}
 
 RUN apt-get update && \
     apt-get install apt-utils -y && \
@@ -16,14 +27,34 @@ RUN apt-get update && \
     apt-get install bash grep -y && \
     rm -rf /var/lib/apt/lists/* 
 
-ADD iventoy-1.0.03-linux.tar.gz /opt/
+# Install some tools useful for diag
+RUN apt-get update && \
+    apt-get install less ncat curl wget net-tools procps iproute2 -y && \
+    rm -rf /var/lib/apt/lists/* 
 
-RUN mv /opt/iventoy-${IVENTOY_VERSION} /opt/iventoy
+COPY --from=build ${IVENTOY_DIR} ${IVENTOY_DIR}
+COPY files/default_files/data ${IVENTOY_DIR}/default_files/data
+COPY files/default_files/user ${IVENTOY_DIR}/default_files/user
 
-COPY docker-entrypoint.sh /opt/iventoy/docker-entrypoint.sh
+COPY files/docker-entrypoint.sh ${IVENTOY_DIR}/docker-entrypoint.sh
 
-RUN chmod +x /opt/iventoy/docker-entrypoint.sh
+RUN chmod +x ${IVENTOY_DIR}/docker-entrypoint.sh
 
-WORKDIR /opt/iventoy
+VOLUME ${IVENTOY_DIR}/data
+VOLUME ${IVENTOY_DIR}/iso
+VOLUME ${IVENTOY_DIR}/user
 
-ENTRYPOINT ["/opt/iventoy/docker-entrypoint.sh"]
+WORKDIR ${IVENTOY_DIR}
+
+ENTRYPOINT ["/bin/bash", "-c", "$IVENTOY_DIR_ENV/docker-entrypoint.sh"]
+
+# DHCP server port
+EXPOSE 67/udp
+# tftp server port
+EXPOSE 69/tcp
+# NBD server port
+EXPOSE 10809
+# iventoy HTTP port
+EXPOSE 16000/tcp  
+# iventoy Mgmt port  
+EXPOSE 26000/tcp
