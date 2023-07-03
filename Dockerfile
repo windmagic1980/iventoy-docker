@@ -53,7 +53,7 @@ EXPOSE 67/udp
 # tftp server port
 EXPOSE 69/tcp
 # NBD server port
-EXPOSE 10809
+EXPOSE 10809/tcp
 # iventoy HTTP port
 EXPOSE 16000/tcp  
 # iventoy Mgmt port  
