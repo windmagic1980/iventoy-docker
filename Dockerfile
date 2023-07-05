@@ -33,8 +33,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* 
 
 COPY --from=build ${IVENTOY_DIR} ${IVENTOY_DIR}
-COPY files/default_files/data ${IVENTOY_DIR}/default_files/data
-COPY files/default_files/user ${IVENTOY_DIR}/default_files/user
+COPY --from=build ${IVENTOY_DIR}/data ${IVENTOY_DIR}/default_files/data
+COPY --from=build ${IVENTOY_DIR}/user ${IVENTOY_DIR}/default_files/user
 
 COPY files/docker-entrypoint.sh ${IVENTOY_DIR}/docker-entrypoint.sh
 
