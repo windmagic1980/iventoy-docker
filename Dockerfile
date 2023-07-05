@@ -2,22 +2,29 @@ ARG UBUNTU_VERSION="jammy"
 
 # Use build stage to reduce final image
 FROM ubuntu:${UBUNTU_VERSION} as build
-ARG IVENTOY_VERSION="1.0.07"
+ARG IVENTOY_VERSION="1.0.08"
 ARG IVENTOY_DIR="/opt/iventoy"
+ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.08/iventoy-1.0.08-linux.tar.gz"
+ARG INVENTOY_CHECKSUM="bab21162703190ba2384bddce72f29aee10d63af9655968a8137f2ed48f681f2"
 
-ADD iventoy/iventoy-${IVENTOY_VERSION}-linux.tar.gz /
+ADD ${IVENTOY_URL} /
+
+RUN echo "${INVENTOY_CHECKSUM} iventoy-${IVENTOY_VERSION}-linux.tar.gz" | sha256sum --check
+
+RUN tar xzf /iventoy-${IVENTOY_VERSION}-linux.tar.gz
 RUN mv /iventoy-${IVENTOY_VERSION} ${IVENTOY_DIR}
 
 # Build final image
 FROM ubuntu:${UBUNTU_VERSION}
 ARG BUILD_VERSION="1"
-ARG IVENTOY_VERSION="1.0.07"
+ARG IVENTOY_VERSION="1.0.08"
 ARG IVENTOY_DIR="/opt/iventoy"
 ENV IVENTOY_DIR_ENV=${IVENTOY_DIR}
 
 LABEL maintainer="joeclifford - git@cliffsy.co.uk"
 LABEL Name=iventoy
-LABEL Version=${IVENTOY_VERSION}_${BUILD_VERSION}
+LABEL iventoy_Version=${IVENTOY_VERSION}
+LABEL BUILD ${BUILD_VERSION}
 
 RUN apt-get update && \
     apt-get install apt-utils -y && \
