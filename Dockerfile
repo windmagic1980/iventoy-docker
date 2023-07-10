@@ -2,26 +2,26 @@ ARG UBUNTU_VERSION="jammy"
 
 # Use build stage to reduce final image
 FROM ubuntu:${UBUNTU_VERSION} as build
-ARG IVENTOY_VERSION="1.0.08"
-ARG IVENTOY_DIR="/opt/iventoy"
-ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.08/iventoy-1.0.08-linux.tar.gz"
-ARG INVENTOY_CHECKSUM="bab21162703190ba2384bddce72f29aee10d63af9655968a8137f2ed48f681f2"
+ARG IVENTOY_VERSION="1.0.09"
+ARG IVENTOY_DIR="/app/iventoy"
+ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.09/iventoy-1.0.09-linux.tar.gz"
+ARG INVENTOY_CHECKSUM="21ee8a5f366bb4749facd2545264a0e3b30cf25676c83a438d3cdd78965cf702"
 
 ADD ${IVENTOY_URL} /
 
 RUN echo "${INVENTOY_CHECKSUM} iventoy-${IVENTOY_VERSION}-linux.tar.gz" | sha256sum --check
 
-RUN tar xzf /iventoy-${IVENTOY_VERSION}-linux.tar.gz
+RUN mkdir /app && tar xzf /iventoy-${IVENTOY_VERSION}-linux.tar.gz
 RUN mv /iventoy-${IVENTOY_VERSION} ${IVENTOY_DIR}
 
 # Build final image
 FROM ubuntu:${UBUNTU_VERSION}
 ARG BUILD_VERSION="1"
-ARG IVENTOY_VERSION="1.0.08"
-ARG IVENTOY_DIR="/opt/iventoy"
+ARG IVENTOY_VERSION="1.0.09"
+ARG IVENTOY_DIR="/app/iventoy"
 ENV IVENTOY_DIR_ENV=${IVENTOY_DIR}
 
-LABEL maintainer="joeclifford - git@cliffsy.co.uk"
+LABEL maintainer="wind.magic.luo@gmail.com"
 LABEL Name=iventoy
 LABEL iventoy_Version=${IVENTOY_VERSION}
 LABEL BUILD ${BUILD_VERSION}
@@ -43,9 +43,9 @@ COPY --from=build ${IVENTOY_DIR} ${IVENTOY_DIR}
 COPY --from=build ${IVENTOY_DIR}/data ${IVENTOY_DIR}/default_files/data
 COPY --from=build ${IVENTOY_DIR}/user ${IVENTOY_DIR}/default_files/user
 
-COPY files/docker-entrypoint.sh ${IVENTOY_DIR}/docker-entrypoint.sh
+COPY ./entrypoint.sh ${IVENTOY_DIR}/entrypoint.sh
 
-RUN chmod +x ${IVENTOY_DIR}/docker-entrypoint.sh
+RUN chmod +x ${IVENTOY_DIR}/entrypoint.sh
 
 VOLUME ${IVENTOY_DIR}/data
 VOLUME ${IVENTOY_DIR}/iso
@@ -53,7 +53,7 @@ VOLUME ${IVENTOY_DIR}/user
 
 WORKDIR ${IVENTOY_DIR}
 
-ENTRYPOINT ["/bin/bash", "-c", "$IVENTOY_DIR_ENV/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "$IVENTOY_DIR_ENV/entrypoint.sh"]
 
 # DHCP server port
 EXPOSE 67/udp
