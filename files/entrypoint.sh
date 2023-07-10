@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Copy default files if missing
 FILE=$IVENTOY_DIR_ENV/data/iventoy.dat
