@@ -43,7 +43,7 @@ COPY --from=build ${IVENTOY_DIR} ${IVENTOY_DIR}
 COPY --from=build ${IVENTOY_DIR}/data ${IVENTOY_DIR}/default_files/data
 COPY --from=build ${IVENTOY_DIR}/user ${IVENTOY_DIR}/default_files/user
 
-COPY ./entrypoint.sh ${IVENTOY_DIR}/entrypoint.sh
+COPY entrypoint.sh ${IVENTOY_DIR}/entrypoint.sh
 
 RUN chmod +x ${IVENTOY_DIR}/entrypoint.sh
 
