@@ -11,7 +11,7 @@ ADD ${IVENTOY_URL} /
 
 RUN echo "${INVENTOY_CHECKSUM} iventoy-${IVENTOY_VERSION}-linux-free.tar.gz" | sha256sum --check
 
-RUN mkdir /app && tar xzf /iventoy-${IVENTOY_VERSION}-linux.tar.gz
+RUN mkdir /app && tar xzf /iventoy-${IVENTOY_VERSION}-linux-free.tar.gz
 RUN mv /iventoy-${IVENTOY_VERSION} ${IVENTOY_DIR}
 
 # Build final image
