@@ -2,10 +2,10 @@ ARG UBUNTU_VERSION="jammy"
 
 # Use build stage to reduce final image
 FROM ubuntu:${UBUNTU_VERSION} as build
-ARG IVENTOY_VERSION="1.0.10"
+ARG IVENTOY_VERSION="1.0.11"
 ARG IVENTOY_DIR="/app/iventoy"
-ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.10/iventoy-1.0.10-linux.tar.gz"
-ARG INVENTOY_CHECKSUM="b8e34d9746d3f6ed977fd6a57b2c0735b4b053cd15e483f700b8d80007d666ac"
+ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.11/iventoy-1.0.11-linux-free.tar.gz"
+ARG INVENTOY_CHECKSUM="1da621393a146484899e9c6f4dcd2cadf6495cf3b531b01ac998cff41e72f2b9"
 
 ADD ${IVENTOY_URL} /
 
@@ -17,7 +17,7 @@ RUN mv /iventoy-${IVENTOY_VERSION} ${IVENTOY_DIR}
 # Build final image
 FROM ubuntu:${UBUNTU_VERSION}
 ARG BUILD_VERSION="1"
-ARG IVENTOY_VERSION="1.0.10"
+ARG IVENTOY_VERSION="1.0.11"
 ARG IVENTOY_DIR="/app/iventoy"
 ENV IVENTOY_DIR_ENV=${IVENTOY_DIR}
 
