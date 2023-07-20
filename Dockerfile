@@ -2,7 +2,7 @@ ARG UBUNTU_VERSION="jammy"
 
 # Use build stage to reduce final image
 FROM ubuntu:${UBUNTU_VERSION} as build
-ARG IVENTOY_VERSION="1.0.13"
+ARG IVENTOY_VERSION="1.0.16"
 ARG IVENTOY_DIR="/app/iventoy"
 ARG IVENTOY_URL="https://github.com/ventoy/PXE/releases/download/v1.0.16/iventoy-1.0.16-linux-free.tar.gz"
 ARG INVENTOY_CHECKSUM="dde02a9769c5ac292d6311c3de75e7225d2df953a3419c37361b9e7e84a7d352"
